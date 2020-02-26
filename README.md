@@ -1,6 +1,6 @@
 # How Many Genie Lamps (HMGL)
 
-HMGL is a simple command-line application that calculates how many [genie lamps][lamp] or [books of knowledge][book]
+HMGL is a simple command-line application that calculates how many [genie lamps][lamp] or [books of knowledge][book_knowledge]
 are required to reach a certain level or experience.
 
 Wrote this as my first [Rust](https://www.rust-lang.org/) application.
