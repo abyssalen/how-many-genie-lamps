@@ -150,17 +150,13 @@ impl Skill {
             xp,
         })
     }
-
-    // TODO possibly return a Result
     pub fn gain_xp(&mut self, xp: u32) {
-        let new_xp = self.xp + xp;
-        let level = match get_xp_to_level(new_xp) {
-            Some(level) => level,
-            None => panic!(
-                "too much xp is gained! Level doesn't exist for the new xp of {}",
-                new_xp
-            ),
+        let new_xp: u32 = if self.xp + xp > MAXIMUM_XP as u32 {
+            MAXIMUM_XP as u32
+        } else {
+            self.xp + xp
         };
+        let level = get_xp_to_level(new_xp).unwrap();
         self.xp = new_xp;
         if self.level < level {
             self.level = level;
@@ -213,11 +209,10 @@ mod test {
     }
 
     #[test]
-    #[should_panic]
-    fn test_invalid_gain_xp_in_skill() {
-        // overflow of xp
+    fn test_gain_over_max_xp_in_skill() {
         let mut level = Skill::from_level(65).unwrap();
         level.gain_xp(200_000_000);
+        assert_eq!(level.xp, 200_000_000)
     }
 
     #[test]
