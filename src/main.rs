@@ -10,14 +10,14 @@ fn main() {
         .about("Calculates how many genie lamps are required to meet a certain level or experience")
         .arg(
             Arg::with_name("starting-level")
-                .long("starting-level")
+                .long("start-lvl")
                 .value_name("LEVEL")
                 .help("Sets the starting level")
                 .takes_value(true),
         )
         .arg(
             Arg::with_name("starting-xp")
-                .long("starting-xp")
+                .long("start-xp")
                 .value_name("STARTING-XP")
                 .help("Sets the starting xp")
                 .conflicts_with("starting-level")
@@ -25,15 +25,15 @@ fn main() {
         )
         .arg(
             Arg::with_name("target-level")
-                .long("target-level")
+                .long("end-lvl")
                 .value_name("LEVEL")
                 .help("Sets the target level")
                 .takes_value(true),
         )
         .arg(
             Arg::with_name("target-xp")
-                .long("target-xp")
-                .value_name("target-XP")
+                .long("end-xp")
+                .value_name("TARGET-XP")
                 .help("Sets the target xp")
                 .conflicts_with("target-level")
                 .takes_value(true),
