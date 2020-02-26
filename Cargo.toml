@@ -1,0 +1,14 @@
+[package]
+name = "how-many-genie-lamps"
+version = "0.1.0"
+authors = ["Ronnie Tran <ronnie.tran2@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+name = "rs_lamps"
+path = "src/lib.rs"
+
+
+[dependencies]
