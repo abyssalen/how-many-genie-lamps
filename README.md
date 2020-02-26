@@ -1,11 +1,10 @@
-# How Many Genie Lamps (GMGL)
+# How Many Genie Lamps (HMGL)
 
-
-GMGL is a simple command-line application that calculates how many of an experience item such as
-the [Genie Lamp][lamp] in [Old School RuneScape][osrs] that is required
+HMGL is a simple command-line application that calculates how many of an experience item such as
+the [Genie Lamp][lamp] in [Old School RuneScape][osrs] is required
 to reach a certain level or experience.
 
-Wrote this as my first [Rust][rust] application.
+Wrote this as my first [Rust](https://www.rust-lang.org/) application.
 
 ## Usage
 
@@ -84,4 +83,3 @@ such as the [Book of Knowledge][book_knowledge].
 [lamp]: https://oldschool.runescape.wiki/w/Lamp
 [book_knowledge]: https://oldschool.runescape.wiki/w/Book_of_knowledge
 [osrs]: https://oldschool.runescape.com/
-[rust]: https://www.rust-lang.org/
