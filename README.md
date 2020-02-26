@@ -42,7 +42,7 @@ Which will both output:
 ```
 Starting = [level: 1, xp: 0]
 Target = [level: 99, xp: 13,034,431]
-You need 15,057 lamps to reach the target.
+You need 15,057 lamps or 10,039 books to reach the target.
 ```
 
 Note that you can mix and match xp and levels for starting and target skills. 
@@ -59,7 +59,7 @@ Which will both output the same result:
 ```
 Starting = [level: 1, xp: 0]
 Target = [level: 99, xp: 13,034,431]
-You need 15,057 lamps to reach the target.
+You need 15,057 lamps or 10,039 books to reach the target.
 ```
 
 ## TODO
