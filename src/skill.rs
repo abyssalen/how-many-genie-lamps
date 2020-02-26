@@ -135,7 +135,6 @@ const XP_TABLE: [u32; MAXIMUM_LEVEL] = [
 pub struct Skill {
     level: u8,
     xp: u32,
-    _private: (),
 }
 
 impl Skill {
@@ -143,14 +142,12 @@ impl Skill {
         Some(Skill {
             level,
             xp: get_level_to_xp(level)?,
-            _private: (),
         })
     }
     pub fn from_xp(xp: u32) -> Option<Skill> {
         Some(Skill {
             level: get_xp_to_level(xp)?,
             xp,
-            _private: (),
         })
     }
 
