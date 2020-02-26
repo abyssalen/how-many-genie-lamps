@@ -5,6 +5,8 @@ GMGL is a simple command-line application that calculates how many of an experie
 the [Genie Lamp][lamp] in [Old School RuneScape][osrs] that is required
 to reach a certain level or experience.
 
+Wrote this as my first [Rust][rust] application.
+
 ## Usage
 
 ```
@@ -62,9 +64,9 @@ Target = [level: 99, xp: 13,034,431]
 You need 15,057 lamps to reach the target.
 ```
 
-## Missing Features
+## TODO
 
-* Only [genie lamps][lamp] are supported. 
+* Only [Genie Lamps][lamp] are supported
 
 I would like to include other experience items 
 such as the [Book of Knowledge][book_knowledge].
@@ -79,3 +81,4 @@ such as the [Book of Knowledge][book_knowledge].
 [lamp]: https://oldschool.runescape.wiki/w/Lamp
 [book_knowledge]: https://oldschool.runescape.wiki/w/Book_of_knowledge
 [osrs]: https://oldschool.runescape.com/
+[rust]: https://www.rust-lang.org/
