@@ -154,7 +154,6 @@ impl Skill {
     }
 }
 
-
 pub fn get_level_to_xp(level: u8) -> Option<u32> {
     match level {
         level if level == 0 => None,
