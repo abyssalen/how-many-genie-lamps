@@ -1,13 +1,14 @@
 use clap::{value_t, App, Arg};
 
 use num_format::{Locale, ToFormattedString};
+use rs_lamps::experience_item::ExperienceItem;
 use rs_lamps::skill::Skill;
 
 fn main() {
     let matches = App::new("How Many Genie Lamps?")
         .version("0.1.0")
         .author("Ronnie T. <ronnie.tran2@gmail.com>")
-        .about("Calculates how many genie lamps are required to meet a certain level or experience")
+        .about("Calculates how many genie lamps and books of knowledge are required to meet a certain level or experience")
         .arg(
             Arg::with_name("starting-level")
                 .long("start-lvl")
@@ -71,11 +72,6 @@ fn main() {
     let starting = starting.unwrap();
     let target = target.unwrap();
 
-    let number_of_items_needed =
-        rs_lamps::experience_item::calculate_number_of_lamps(&starting, &target)
-            .unwrap()
-            .to_formatted_string(&Locale::en);
-
     println!(
         "Starting = [level: {}, xp: {}]",
         starting
@@ -88,8 +84,25 @@ fn main() {
         target.get_current_level().to_formatted_string(&Locale::en),
         target.get_current_xp().to_formatted_string(&Locale::en)
     );
+
+    let number_of_items_needed = rs_lamps::experience_item::calculate_number_of_experience_item(
+        &starting,
+        &target,
+        ExperienceItem::GenieLamp,
+    )
+    .unwrap()
+    .to_formatted_string(&Locale::en);
+
+    let number_of_items_needed_book =
+        rs_lamps::experience_item::calculate_number_of_experience_item(
+            &starting,
+            &target,
+            ExperienceItem::BookOfKnowledge,
+        )
+        .unwrap()
+        .to_formatted_string(&Locale::en);
     println!(
-        "You need {} lamps to reach the target.",
-        number_of_items_needed,
+        "You need {} lamps or {} books to reach the target.",
+        number_of_items_needed, number_of_items_needed_book,
     );
 }

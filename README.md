@@ -1,8 +1,7 @@
 # How Many Genie Lamps (HMGL)
 
-HMGL is a simple command-line application that calculates how many of an experience item such as
-the [Genie Lamp][lamp] in [Old School RuneScape][osrs] is required
-to reach a certain level or experience.
+HMGL is a simple command-line application that calculates how many [genie lamps][lamp] or [books of knowledge][book]
+are required to reach a certain level or experience.
 
 Wrote this as my first [Rust](https://www.rust-lang.org/) application.
 
@@ -12,7 +11,7 @@ Wrote this as my first [Rust](https://www.rust-lang.org/) application.
 $ how-many-genie-lamps --help
 
 How Many Genie Lamps? 0.1
-Calculates how many genie lamps are required to meet a certain level or experience
+Calculates how many genie lamps and books of knowledge are required to meet a certain level or experience
  
 USAGE:
     how-many-genie-lamps.exe [OPTIONS]
@@ -64,11 +63,6 @@ You need 15,057 lamps to reach the target.
 ```
 
 ## TODO
-
-* Only [Genie Lamps][lamp] are supported
-
-I would like to include other experience items 
-such as the [Book of Knowledge][book_knowledge].
 
 * Possibly a GUI on the web or on desktop
 
