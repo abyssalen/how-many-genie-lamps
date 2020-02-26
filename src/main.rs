@@ -1,19 +1,95 @@
-use rs_lamps::*;
+use clap::{value_t, App, Arg};
+
+use num_format::{Locale, ToFormattedString};
+use rs_lamps::skill::Skill;
 
 fn main() {
-    // TODO the CLI
+    let matches = App::new("How Many Genie Lamps?")
+        .version("0.1.0")
+        .author("Ronnie T. <ronnie.tran2@gmail.com>")
+        .about("Calculates how many genie lamps are required to meet a certain level or experience")
+        .arg(
+            Arg::with_name("starting-level")
+                .long("starting-level")
+                .value_name("LEVEL")
+                .help("Sets the starting level")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("starting-xp")
+                .long("starting-xp")
+                .value_name("STARTING-XP")
+                .help("Sets the starting xp")
+                .conflicts_with("starting-level")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("target-level")
+                .long("target-level")
+                .value_name("LEVEL")
+                .help("Sets the target level")
+                .takes_value(true),
+        )
+        .arg(
+            Arg::with_name("target-xp")
+                .long("target-xp")
+                .value_name("target-XP")
+                .help("Sets the target xp")
+                .conflicts_with("target-level")
+                .takes_value(true),
+        )
+        .get_matches();
 
-    let starting = rs_lamps::skill::Skill::from_level(1).expect("Should be fine");
-    let target = rs_lamps::skill::Skill::from_level(99).expect("Should be fine");
+    let starting = match (
+        value_t!(matches, "starting-level", u8),
+        value_t!(matches, "starting-xp", u32),
+    ) {
+        (Ok(v), Err(_)) => Skill::from_level(v),
+        (Err(_), Ok(v)) => Skill::from_xp(v),
+        _ => None,
+    };
 
-    let lamps = rs_lamps::experience_item::calculate_number_of_lamps(&starting, &target);
+    if starting.is_none() {
+        print!("Could not parse skill from command line arguments.");
+        return;
+    }
 
+    let target = match (
+        value_t!(matches, "target-level", u8),
+        value_t!(matches, "target-xp", u32),
+    ) {
+        (Ok(v), Err(_)) => Skill::from_level(v),
+        (Err(_), Ok(v)) => Skill::from_xp(v),
+        _ => None,
+    };
 
-    println!("Starting level: {}, xp: {}", starting.get_current_level(), starting.get_current_xp());
-    println!("Target level: {}, xp: {}", target.get_current_level(), target.get_current_xp());
+    if target.is_none() {
+        print!("Could not parse target skill from command line arguments.");
+        return;
+    }
+
+    let starting = starting.unwrap();
+    let target = target.unwrap();
+
+    let number_of_items_needed =
+        rs_lamps::experience_item::calculate_number_of_lamps(&starting, &target)
+            .unwrap()
+            .to_formatted_string(&Locale::en);
+
     println!(
-        "You need to use {} lamps to reach level {}.",
-        lamps.unwrap_or_default(),
-        target.get_current_level()
+        "Starting = [level: {}, xp: {}]",
+        starting
+            .get_current_level()
+            .to_formatted_string(&Locale::en),
+        starting.get_current_xp().to_formatted_string(&Locale::en)
+    );
+    println!(
+        "Target = [level: {}, xp: {}]",
+        target.get_current_level().to_formatted_string(&Locale::en),
+        target.get_current_xp().to_formatted_string(&Locale::en)
+    );
+    println!(
+        "You need {} lamps to reach the target.",
+        number_of_items_needed,
     );
 }

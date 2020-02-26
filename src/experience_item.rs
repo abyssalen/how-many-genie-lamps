@@ -1,6 +1,4 @@
-use crate::skill;
 use crate::skill::Skill;
-use std::fmt::Error;
 
 // TODO other experience items such as book of knowledge
 
@@ -8,18 +6,17 @@ pub fn calculate_number_of_lamps(starting: &Skill, target: &Skill) -> Option<u32
     let mut starting = starting.clone();
     let mut count = 0;
     while starting.get_current_xp() < target.get_current_xp() {
-        let gain = (starting.get_current_level() as u32 * 10);
+        let gain = starting.get_current_level() as u32 * 10;
         starting.gain_xp(gain);
         count += 1;
     }
     Some(count)
 }
 
-
 #[cfg(test)]
 mod test {
-    use crate::skill::Skill;
     use crate::experience_item::calculate_number_of_lamps;
+    use crate::skill::Skill;
 
     #[test]
     fn test_lamps_from_1_to_99() {
