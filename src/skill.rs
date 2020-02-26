@@ -131,14 +131,15 @@ const XP_TABLE: [u32; MAXIMUM_LEVEL] = [
     200_000_000,
 ];
 
+#[derive(Debug, Clone)]
 pub struct Skill {
-    pub level: u8,
-    pub xp: u32,
+    level: u8,
+    xp: u32,
     _private: (),
 }
 
 impl Skill {
-    pub fn new(level: u8) -> Option<Skill> {
+    pub fn from_level(level: u8) -> Option<Skill> {
         Some(Skill {
             level,
             xp: get_level_to_xp(level)?,
@@ -152,6 +153,21 @@ impl Skill {
             _private: (),
         })
     }
+
+    pub fn gain_xp(&mut self, xp: u32) {
+        let new_xp = self.xp + xp;
+        let level = match get_xp_to_level(new_xp) {
+            Some(level) => level,
+            None => panic!("too much xp is gained! Level doesn't exist for the new xp of {}", new_xp),
+        };
+        self.xp = new_xp;
+        if self.level < level {
+            self.level = level;
+        }
+    }
+    pub fn get_current_level(&self) -> u8 { self.level }
+
+    pub fn get_current_xp(&self) -> u32 { self.xp }
 }
 
 pub fn get_level_to_xp(level: u8) -> Option<u32> {
@@ -176,8 +192,34 @@ mod test {
     use super::{get_level_to_xp, get_xp_to_level, Skill};
 
     #[test]
+    fn test_gain_xp_in_skill() {
+        let mut level = Skill::from_level(99).unwrap();
+        level.gain_xp(1000);
+        assert_eq!(level.level, 99);
+        assert_eq!(level.xp, 13_035_431);
+    }
+
+    #[test]
+    fn test_gain_level_in_skill() {
+        let mut level = Skill::from_level(1).unwrap();
+        level.gain_xp(88);
+        assert_eq!(level.level, 2);
+        assert_eq!(level.xp, 88);
+    }
+
+
+    #[test]
+    #[should_panic]
+    fn test_invalid_gain_xp_in_skill() {
+        // overflow of xp
+        let mut level = Skill::from_level(65).unwrap();
+        level.gain_xp(200_000_000);
+    }
+
+
+    #[test]
     fn test_create_skill_valid() {
-        let level = Skill::new(99).unwrap();
+        let level = Skill::from_level(99).unwrap();
         assert_eq!(level.level, 99);
         assert_eq!(level.xp, 13_034_431)
     }
@@ -191,7 +233,7 @@ mod test {
 
     #[test]
     fn test_create_skill_invalid() {
-        assert!(Skill::new(128).is_none());
+        assert!(Skill::from_level(128).is_none());
     }
 
     #[test]
