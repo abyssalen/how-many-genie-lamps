@@ -18,7 +18,7 @@ pub fn calculate_number_of_experience_item(
     starting: &Skill,
     target: &Skill,
     item: ExperienceItem,
-) -> Option<u32> {
+) -> u32 {
     let mut starting = starting.clone();
     let mut count = 0;
     while starting.get_current_xp() < target.get_current_xp() {
@@ -26,7 +26,7 @@ pub fn calculate_number_of_experience_item(
         starting.gain_xp(gain);
         count += 1;
     }
-    Some(count)
+    count
 }
 
 #[cfg(test)]
@@ -39,8 +39,7 @@ mod test {
         let starting = Skill::from_level(1).unwrap();
         let target = Skill::from_level(99).unwrap();
         let amount =
-            calculate_number_of_experience_item(&starting, &target, ExperienceItem::GenieLamp)
-                .unwrap();
+            calculate_number_of_experience_item(&starting, &target, ExperienceItem::GenieLamp);
         assert_eq!(amount, 15_057);
     }
 
@@ -49,8 +48,7 @@ mod test {
         let starting = Skill::from_xp(12_465).unwrap();
         let target = Skill::from_xp(32_085).unwrap();
         let amount =
-            calculate_number_of_experience_item(&starting, &target, ExperienceItem::GenieLamp)
-                .unwrap();
+            calculate_number_of_experience_item(&starting, &target, ExperienceItem::GenieLamp);
         assert_eq!(amount, 58);
     }
 
@@ -62,8 +60,7 @@ mod test {
             &starting,
             &target,
             ExperienceItem::BookOfKnowledge,
-        )
-        .unwrap();
+        );
         assert_eq!(amount, 10_039);
     }
 
@@ -75,8 +72,7 @@ mod test {
             &starting,
             &target,
             ExperienceItem::BookOfKnowledge,
-        )
-        .unwrap();
+        );
         assert_eq!(amount, 39);
     }
 }

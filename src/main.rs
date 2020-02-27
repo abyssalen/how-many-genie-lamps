@@ -90,7 +90,6 @@ fn main() {
         &target,
         ExperienceItem::GenieLamp,
     )
-    .unwrap()
     .to_formatted_string(&Locale::en);
 
     let number_of_items_needed_book =
@@ -99,7 +98,6 @@ fn main() {
             &target,
             ExperienceItem::BookOfKnowledge,
         )
-        .unwrap()
         .to_formatted_string(&Locale::en);
     println!(
         "You need {} lamps or {} books to reach the target.",
