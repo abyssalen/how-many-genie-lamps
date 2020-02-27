@@ -162,8 +162,8 @@ impl Skill {
             self.level = level;
         }
     }
-    pub fn get_current_level(&self) -> u8 {
-        self.level
+    pub fn get_current_level(&self) -> u32 {
+        u32::from(self.level)
     }
 
     pub fn get_current_xp(&self) -> u32 {

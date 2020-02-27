@@ -85,20 +85,19 @@ fn main() {
         target.get_current_xp().to_formatted_string(&Locale::en)
     );
 
-    let number_of_items_needed = rs_lamps::experience_item::calculate_number_of_experience_item(
+    let number_of_items_needed = rs_lamps::experience_item::calculate_number_of_items_needed(
         &starting,
         &target,
         ExperienceItem::GenieLamp,
     )
     .to_formatted_string(&Locale::en);
 
-    let number_of_items_needed_book =
-        rs_lamps::experience_item::calculate_number_of_experience_item(
-            &starting,
-            &target,
-            ExperienceItem::BookOfKnowledge,
-        )
-        .to_formatted_string(&Locale::en);
+    let number_of_items_needed_book = rs_lamps::experience_item::calculate_number_of_items_needed(
+        &starting,
+        &target,
+        ExperienceItem::BookOfKnowledge,
+    )
+    .to_formatted_string(&Locale::en);
     println!(
         "You need {} lamps or {} books to reach the target.",
         number_of_items_needed, number_of_items_needed_book,
