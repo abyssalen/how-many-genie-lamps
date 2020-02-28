@@ -170,7 +170,6 @@ impl Xp {
 impl Skill {
     pub fn from_level(level: Level) -> Option<Skill> {
         let xp_from_level = level.as_xp();
-
         Some(Skill {
             level,
             xp: xp_from_level?,
@@ -188,14 +187,14 @@ impl Skill {
     pub fn gain_xp(&mut self, xp: Xp) {
         let Xp(current_xp) = self.xp;
         let Xp(xp_to_add) = xp;
-        let new_xp: Xp = if current_xp + xp_to_add > MAXIMUM_XP.0 {
+        let Xp(maximum_xp) = MAXIMUM_XP;
+        let new_xp: Xp = if current_xp + xp_to_add > maximum_xp {
             MAXIMUM_XP
         } else {
             Xp(current_xp + xp_to_add)
         };
         let Level(current_level) = self.level;
         let Level(level_from_new_xp) = new_xp.as_level().expect("problem getting level from xp");
-
         if current_level < level_from_new_xp {
             self.level = Level(level_from_new_xp);
         }
