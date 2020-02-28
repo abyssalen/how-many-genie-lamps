@@ -1,8 +1,8 @@
 use clap::{value_t, App, Arg};
 
+use hmgl::experience_item::{BOOK_OF_KNOWLEDGE, GENIE_LAMP};
+use hmgl::skill::{Level, Skill, Xp};
 use num_format::{Locale, ToFormattedString};
-use rs_lamps::experience_item::ExperienceItem;
-use rs_lamps::skill::Skill;
 
 fn main() {
     let matches = App::new("How Many Genie Lamps?")
@@ -45,10 +45,12 @@ fn main() {
         value_t!(matches, "starting-level", u8),
         value_t!(matches, "starting-xp", u32),
     ) {
-        (Ok(v), Err(_)) => Skill::from_level(v),
-        (Err(_), Ok(v)) => Skill::from_xp(v),
+        (Ok(v), Err(_)) => Skill::from_level(Level(v)),
+        (Err(_), Ok(v)) => Skill::from_xp(Xp(v)),
         _ => None,
     };
+
+    // TODO better error handling for command line arguments
 
     if starting.is_none() {
         print!("Could not parse skill from command line arguments.");
@@ -59,8 +61,8 @@ fn main() {
         value_t!(matches, "target-level", u8),
         value_t!(matches, "target-xp", u32),
     ) {
-        (Ok(v), Err(_)) => Skill::from_level(v),
-        (Err(_), Ok(v)) => Skill::from_xp(v),
+        (Ok(v), Err(_)) => Skill::from_level(Level(v)),
+        (Err(_), Ok(v)) => Skill::from_xp(Xp(v)),
         _ => None,
     };
 
@@ -76,26 +78,27 @@ fn main() {
         "Starting = [level: {}, xp: {}]",
         starting
             .get_current_level()
+            .0
             .to_formatted_string(&Locale::en),
-        starting.get_current_xp().to_formatted_string(&Locale::en)
+        starting.get_current_xp().0.to_formatted_string(&Locale::en)
     );
     println!(
         "Target = [level: {}, xp: {}]",
-        target.get_current_level().to_formatted_string(&Locale::en),
-        target.get_current_xp().to_formatted_string(&Locale::en)
+        target
+            .get_current_level()
+            .0
+            .to_formatted_string(&Locale::en),
+        target.get_current_xp().0.to_formatted_string(&Locale::en)
     );
 
-    let number_of_items_needed = rs_lamps::experience_item::calculate_number_of_items_needed(
-        &starting,
-        &target,
-        ExperienceItem::GenieLamp,
-    )
-    .to_formatted_string(&Locale::en);
+    let number_of_items_needed =
+        hmgl::experience_item::calculate_number_of_items_needed(&starting, &target, GENIE_LAMP)
+            .to_formatted_string(&Locale::en);
 
-    let number_of_items_needed_book = rs_lamps::experience_item::calculate_number_of_items_needed(
+    let number_of_items_needed_book = hmgl::experience_item::calculate_number_of_items_needed(
         &starting,
         &target,
-        ExperienceItem::BookOfKnowledge,
+        BOOK_OF_KNOWLEDGE,
     )
     .to_formatted_string(&Locale::en);
     println!(

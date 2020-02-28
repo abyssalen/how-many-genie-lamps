@@ -1,7 +1,7 @@
-const MAXIMUM_LEVEL: usize = 127;
-const MAXIMUM_XP: usize = 200_000_000;
+const MAXIMUM_LEVEL: Level = Level(127);
+const MAXIMUM_XP: Xp = Xp(200_000_000);
 
-const XP_TABLE: [u32; MAXIMUM_LEVEL] = [
+const XP_TABLE: [u32; MAXIMUM_LEVEL.0 as usize] = [
     0,
     83,
     174,
@@ -131,164 +131,194 @@ const XP_TABLE: [u32; MAXIMUM_LEVEL] = [
     200_000_000,
 ];
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Skill {
-    level: u8,
-    xp: u32,
+    level: Level,
+    xp: Xp,
+}
+
+#[derive(Debug)]
+pub struct Level(pub u8);
+
+impl Level {
+    fn as_xp(&self) -> Option<Xp> {
+        match self.0 {
+            level if level == 0 => None,
+            level if level >= MAXIMUM_LEVEL.0 => None,
+            level => Some(Xp(XP_TABLE[level as usize - 1])),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Xp(pub u32);
+
+impl Xp {
+    fn as_level(&self) -> Option<Level> {
+        match self.0 {
+            xp if xp > MAXIMUM_XP.0 => None,
+            xp => Some(Level(
+                (1..MAXIMUM_LEVEL.0)
+                    .rev()
+                    .find(|level| Level(*level).as_xp().unwrap().0 <= xp)
+                    .unwrap(),
+            )),
+        }
+    }
 }
 
 impl Skill {
-    pub fn from_level(level: u8) -> Option<Skill> {
+    pub fn from_level(level: Level) -> Option<Skill> {
+        let xp_from_level = level.as_xp();
+
         Some(Skill {
             level,
-            xp: get_level_to_xp(level)?,
+            xp: xp_from_level?,
         })
     }
-    pub fn from_xp(xp: u32) -> Option<Skill> {
+
+    pub fn from_xp(xp: Xp) -> Option<Skill> {
+        let level_from_xp = xp.as_level();
         Some(Skill {
-            level: get_xp_to_level(xp)?,
+            level: level_from_xp?,
             xp,
         })
     }
-    pub fn gain_xp(&mut self, xp: u32) {
-        let new_xp: u32 = if self.xp + xp > MAXIMUM_XP as u32 {
-            MAXIMUM_XP as u32
+
+    pub fn gain_xp(&mut self, xp: Xp) {
+        let Xp(current_xp) = self.xp;
+        let Xp(xp_to_add) = xp;
+        let new_xp: Xp = if current_xp + xp_to_add > MAXIMUM_XP.0 {
+            MAXIMUM_XP
         } else {
-            self.xp + xp
+            Xp(current_xp + xp_to_add)
         };
-        let level = get_xp_to_level(new_xp).unwrap();
-        self.xp = new_xp;
-        if self.level < level {
-            self.level = level;
+        let Level(current_level) = self.level;
+        let Level(level_from_new_xp) = new_xp.as_level().expect("problem getting level from xp");
+
+        if current_level < level_from_new_xp {
+            self.level = Level(level_from_new_xp);
         }
-    }
-    pub fn get_current_level(&self) -> u32 {
-        u32::from(self.level)
+        self.xp = new_xp;
     }
 
-    pub fn get_current_xp(&self) -> u32 {
-        self.xp
+    pub fn get_current_level(&self) -> &Level {
+        &self.level
     }
-}
 
-pub fn get_level_to_xp(level: u8) -> Option<u32> {
-    match level {
-        level if level == 0 => None,
-        level if level >= MAXIMUM_LEVEL as u8 => None,
-        level => Some(XP_TABLE[level as usize - 1]),
-    }
-}
-
-pub fn get_xp_to_level(xp: u32) -> Option<u8> {
-    match xp {
-        xp if xp > MAXIMUM_XP as u32 => None,
-        xp => (1..MAXIMUM_LEVEL as u8)
-            .rev()
-            .find(|level| get_level_to_xp(*level).unwrap() <= xp),
+    pub fn get_current_xp(&self) -> &Xp {
+        &self.xp
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::{get_level_to_xp, get_xp_to_level, Skill};
+    use super::Skill;
+    use crate::skill::{Level, Xp, MAXIMUM_XP};
 
     #[test]
     fn test_gain_xp_in_skill() {
-        let mut level = Skill::from_level(99).unwrap();
-        level.gain_xp(1000);
-        assert_eq!(level.level, 99);
-        assert_eq!(level.xp, 13_035_431);
+        let mut skill = Skill::from_level(Level(99)).unwrap();
+        let xp = Xp(1_000);
+        skill.gain_xp(xp);
+        assert_eq!(skill.level.0, 99);
+        assert_eq!(skill.xp.0, 13_034_431 + 1_000);
     }
 
     #[test]
     fn test_gain_level_in_skill() {
-        let mut level = Skill::from_level(1).unwrap();
-        level.gain_xp(88);
-        assert_eq!(level.level, 2);
-        assert_eq!(level.xp, 88);
+        let mut skill = Skill::from_level(Level(1)).unwrap();
+        skill.gain_xp(Xp(88));
+        assert_eq!(skill.level.0, 2);
+        assert_eq!(skill.xp.0, 88);
     }
 
     #[test]
     fn test_gain_over_max_xp_in_skill() {
-        let mut level = Skill::from_level(65).unwrap();
-        level.gain_xp(200_000_000);
-        assert_eq!(level.xp, 200_000_000)
+        let mut skill = Skill::from_level(Level(65)).unwrap();
+        skill.gain_xp(MAXIMUM_XP);
+        assert_eq!(skill.xp.0, 200_000_000)
     }
 
     #[test]
     fn test_create_skill_valid() {
-        let level = Skill::from_level(99).unwrap();
-        assert_eq!(level.level, 99);
-        assert_eq!(level.xp, 13_034_431)
+        let skill = Skill::from_level(Level(99)).unwrap();
+        assert_eq!(skill.level.0, 99);
+        assert_eq!(skill.xp.0, 13_034_431)
     }
 
     #[test]
     fn test_create_skill_from_xp_valid() {
-        let level = Skill::from_xp(739_639).unwrap();
-        assert_eq!(level.level, 70);
-        assert_eq!(level.xp, 739_639)
+        let skill = Skill::from_xp(Xp(739_639)).unwrap();
+        assert_eq!(skill.level.0, 70);
+        assert_eq!(skill.xp.0, 739_639)
     }
 
     #[test]
     fn test_create_skill_invalid() {
-        assert!(Skill::from_level(128).is_none());
+        assert!(Skill::from_level(Level(128)).is_none());
     }
 
     #[test]
     fn test_create_skill_from_xp_invalid() {
-        assert!(Skill::from_xp(200_000_001).is_none());
+        assert!(Skill::from_xp(Xp(200_000_001)).is_none());
     }
 
     #[test]
-    fn test_xp_to_level_70() {
-        let xp_level_70 = 739_639;
-        assert_eq!(get_xp_to_level(xp_level_70).unwrap(), 70);
+    fn test_xp_to_same_level() {
+        let xp_level_70 = Xp(739_639);
+        assert_eq!(xp_level_70.as_level().unwrap().0, 70);
 
-        let xp_level_70 = 770_110;
-        assert_eq!(get_xp_to_level(xp_level_70).unwrap(), 70);
+        let xp_level_70 = Xp(770_110);
+        assert_eq!(xp_level_70.as_level().unwrap().0, 70);
+    }
 
-        let xp_level_70 = get_level_to_xp(70).unwrap();
-        assert_eq!(get_xp_to_level(xp_level_70).unwrap(), 70);
+    #[test]
+    fn test_level_to_xp_to_level_again() {
+        // so convert level 70 to its xp equivalent
+        let xp_level_70 = Level(70).as_xp().unwrap();
+        // then convert the xp back into the level
+        assert_eq!(xp_level_70.as_level().unwrap().0, 70);
     }
 
     #[test]
     fn test_xp_0_to_level_1() {
-        assert_eq!(get_xp_to_level(0).unwrap(), 1);
+        assert_eq!(Xp(0).as_level().unwrap().0, 1);
     }
 
     #[test]
     fn test_xp_to_level_126() {
-        assert_eq!(get_xp_to_level(get_level_to_xp(126).unwrap()).unwrap(), 126);
-        assert_eq!(get_xp_to_level(199_884_740).unwrap(), 126);
+        let xp = Xp(199_884_740);
+        assert_eq!(xp.as_level().unwrap().0, 126);
     }
 
     #[test]
     fn test_xp_above_level_126() {
-        assert!(get_xp_to_level(200_884_740).is_none());
+        assert!(Xp(200_884_740).as_level().is_none());
     }
 
     #[test]
     fn test_level_54_to_xp() {
-        assert_eq!(get_level_to_xp(54).unwrap(), 150_872);
+        assert_eq!(Level(54).as_xp().unwrap().0, 150_872);
     }
 
     #[test]
     fn test_level_1_to_xp() {
-        assert_eq!(get_level_to_xp(1).unwrap(), 0);
+        assert_eq!(Level(1).as_xp().unwrap().0, 0);
     }
 
     #[test]
     fn test_level_99_to_xp() {
-        assert_eq!(get_level_to_xp(99).unwrap(), 13_034_431);
+        assert_eq!(Level(99).as_xp().unwrap().0, 13_034_431);
     }
 
     #[test]
     fn test_level_0_to_xp() {
-        assert!(get_level_to_xp(0).is_none());
+        assert!(Level(0).as_xp().is_none());
     }
 
     #[test]
     fn test_above_level_126_to_xp() {
-        assert!(get_level_to_xp(127).is_none());
+        assert!(Level(127).as_xp().is_none());
     }
 }
